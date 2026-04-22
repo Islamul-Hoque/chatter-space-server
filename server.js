@@ -115,12 +115,12 @@ async function run() {
         app.patch('/users/:email', async (req, res) => {
             const email = req.params.email;
             const updateFields = req.body;
-            
+
             const userResult = await userCollection.updateOne(
                 { email: email },
                 { $set: updateFields }
             );
-            
+
             let postResult = null;
             if (updateFields.photoURL) {
                 postResult = await postCollection.updateMany(
@@ -128,7 +128,7 @@ async function run() {
                     { $set: { authorPhoto: updateFields.photoURL } }
                 );
             }
-            
+
             res.send({ userResult, postResult });
         });
 
@@ -136,14 +136,14 @@ async function run() {
         app.get('/chats/:email1/:email2', async (req, res) => {
             const email1 = req.params.email1;
             const email2 = req.params.email2;
-            
+
             const messages = await chatCollection.find({
                 $or: [
                     { sender: email1, receiver: email2 },
                     { sender: email2, receiver: email1 }
                 ]
             }).sort({ timestamp: 1 }).toArray();
-            
+
             res.send(messages);
         });
 
@@ -165,7 +165,7 @@ async function run() {
                     { requester: recipient, recipient: requester }
                 ]
             });
-            
+
             if (existing) {
                 return res.send({ message: 'Request already exists', status: existing.status });
             }
